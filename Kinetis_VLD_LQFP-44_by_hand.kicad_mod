@@ -1,5 +1,5 @@
 (module Kinetis_VLD_LQFP-44_by_hand (layer F.Cu) (tedit 54B8609F)
-  (descr "LQFP44 (see Appnote_PCB_Guidelines_TRINAMIC_packages.pdf)")
+  (descr "10mm hand-solderable LQFP44 for Freescale Kinetis devices")
   (tags "QFP 0.8")
   (attr smd)
   (fp_text reference LQFP-44_10x10mm_Pitch0.8mm (at 0 -2) (layer F.SilkS)

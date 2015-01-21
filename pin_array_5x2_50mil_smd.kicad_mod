@@ -1,5 +1,5 @@
 (module pin_array_5x2_50mil_smd (layer F.Cu) (tedit 549E898C)
-  (descr "Double rangee de contacts 2 x 4 pins")
+  (descr "SMD 50 mil 2x5 connector for SWD header")
   (tags CONN)
   (fp_text reference pin_array_5x2_50mil_smd (at -4.445 0 90) (layer F.SilkS)
     (effects (font (size 1.016 1.016) (thickness 0.2032)))

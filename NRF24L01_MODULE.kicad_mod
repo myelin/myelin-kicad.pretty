@@ -1,5 +1,5 @@
 (module NRF24L01_MODULE (layer F.Cu) (tedit 546ABB05)
-  (descr "Double rangee de contacts 2 x 4 pins")
+  (descr "Footprint for Chinese nRF24L01+ module")
   (tags CONN)
   (fp_text reference NRF24L01+ (at 0 -3.81) (layer F.SilkS)
     (effects (font (size 1.016 1.016) (thickness 0.2032)))

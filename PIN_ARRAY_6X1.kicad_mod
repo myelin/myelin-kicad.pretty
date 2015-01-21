@@ -1,5 +1,5 @@
 (module PIN_ARRAY_6X1 (layer F.Cu) (tedit 54B435B1)
-  (descr "Connecteur 3 pins")
+  (descr "Connecteur 6 pins")
   (tags "CONN DEV")
   (fp_text reference PIN_ARRAY_6X1 (at 0.254 -2.159) (layer F.SilkS)
     (effects (font (size 1.016 1.016) (thickness 0.1524)))
