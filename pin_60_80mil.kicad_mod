@@ -1,0 +1,9 @@
+(module pin_60_80mil (layer F.Cu) (tedit 55028AAC)
+  (fp_text reference pin_60_80mil (at 0 -2.54) (layer F.SilkS) hide
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (fp_text value VAL** (at 0 2.413) (layer F.SilkS)
+    (effects (font (size 1 1) (thickness 0.15)))
+  )
+  (pad 1 thru_hole circle (at 0 0) (size 2.032 2.032) (drill 1.524) (layers *.Cu *.Mask F.SilkS))
+)
