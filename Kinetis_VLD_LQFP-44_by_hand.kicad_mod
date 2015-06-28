@@ -69,4 +69,9 @@
   (pad 42 smd rect (at -2.4 -6.05 90) (size 2 0.45) (layers F.Cu F.Paste F.Mask))
   (pad 43 smd rect (at -3.2 -6.05 90) (size 2 0.45) (layers F.Cu F.Paste F.Mask))
   (pad 44 smd rect (at -4 -6.05 90) (size 2 0.45) (layers F.Cu F.Paste F.Mask))
+  (model Housings_QFP.3dshapes/LQFP-44_10x10mm_Pitch0.8mm.wrl
+    (at (xyz 0 0 0))
+    (scale (xyz 1 1 1))
+    (rotate (xyz 0 0 0))
+  )
 )
