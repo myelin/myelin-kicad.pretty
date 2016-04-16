@@ -1,4 +1,4 @@
-(module micro_usb_b_smd_bottom_mount (layer F.Cu) (tedit 54D04D6D)
+(module micro_usb_b_smd_bottom_mount (layer F.Cu) (tedit 5700691C)
   (descr "micro usb b connector -- designed to go on the bottom of the pcb -- Phillip Pearson")
   (fp_text reference micro_usb_b_pp (at 0.2 4.95) (layer F.SilkS) hide
     (effects (font (thickness 0.3048)))
@@ -14,7 +14,7 @@
   (fp_line (start 3.4 -3.35) (end 3.4 -1.4) (layer F.SilkS) (width 0.13))
   (fp_line (start -1.95 -3.35) (end -3.4 -3.35) (layer F.SilkS) (width 0.13))
   (fp_line (start -3.4 -3.35) (end -3.4 -1.4) (layer F.SilkS) (width 0.13))
-  (fp_text user "pcb edge" (at 0 2.85) (layer F.SilkS)
+  (fp_text user "pcb edge" (at 0 2.85) (layer F.Fab)
     (effects (font (thickness 0.127)))
   )
   (pad "" smd rect (at -4.2 0) (size 1.6 1.9) (layers F.Cu F.Paste F.Mask))
