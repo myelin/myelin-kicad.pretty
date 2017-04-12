@@ -1,3 +1,6 @@
+# This file generates KiCad footprint (.kicad_mod) files directly from
+# a Python script, that specifies all pins, pads, and artwork.
+
 INCH = 25.4
 ALL_CU = "*.Cu" # for pins that go all the way through
 FRONT_CU = "F.Cu"
