@@ -11,10 +11,14 @@ FRONT_PASTE = "F.Paste"
 ALL_MASK = "*.Mask" # for pins that go all the way through
 FRONT_MASK = "F.Mask"
 BACK_MASK = "B.Mask"
+EDGE_CUTS = "Edge.Cuts"
 # standard layer sets for pins and pads
 FRONT_PIN = [ALL_CU, ALL_MASK, FRONT_SILK]
 FRONT_PAD = [FRONT_CU, FRONT_MASK, FRONT_SILK]
+FRONT_TEXT = [FRONT_SILK]
+BACK_TEXT = [BACK_SILK]
 BACK_PAD = [BACK_CU, BACK_MASK, BACK_SILK]
+EDGE = [EDGE_CUTS]
 
 # format python list into kicad netlist format
 def dump_list(list):
@@ -31,7 +35,7 @@ def dump_list(list):
 # format list entry for dump_list()
 def fmt_item(item):
     if type(item) == type(""):
-        if item.find(" ") != -1:
+        if len(item) == 0 or item.find(" ") != -1:
             return '"%s"' % item.replace('"', "'") # munge
     return str(item)
 
@@ -39,13 +43,20 @@ class Element:
     pass
 
 class Text(Element):
-    def __init__(self, x, y, text, kind='user', layers=None, rotation=0):
-        if layers is None: layers = [FRONT_SILK]
-        self.x, self.y, self.text, self.kind, self.layers, self.rotation = (
-            x, y, text, kind, layers[:], rotation)
+    def __init__(self, x, y, text, kind='user', layers=None, rotation=0, mirror=False, bottom=False):
+        if layers is None: layers = FRONT_TEXT
+        if bottom:
+            # shortcut to get text on the bottom layer
+            mirror=True
+            layers=BACK_TEXT
+        self.x, self.y, self.text, self.kind, self.layers, self.rotation, self.mirror = (
+            x, y, text, kind, layers[:], rotation, mirror)
     def as_list(self):
+        effects = ["effects", ["font", ["size", 1, 1], ["thickness", 0.15]]]
+        if self.mirror:
+            effects.append(["justify", "mirror"])
         return ["fp_text", self.kind, self.text, ["at", self.x, self.y, self.rotation], ["layer"] + self.layers,
-            ["effects", ["font", ["size", 1, 1], ["thickness", 0.15]]]
+            effects
         ]
 
 class Line(Element):
@@ -68,6 +79,12 @@ class Pin(Element):
         self.name, self.x, self.y, self.dia, self.hole_dia, self.layers, self.square = name, x, y, dia, hole_dia, layers[:], square
     def as_list(self):
         return ["pad", self.name, "thru_hole", "rect" if self.square else "circle", ["at", self.x, self.y], ["size", self.dia, self.dia], ["drill", self.hole_dia], ["layers"] + self.layers]
+
+class Hole(Pin):
+    def __init__(self, x, y, hole_dia):
+        self.x, self.y, self.hole_dia, self.layers = x, y, hole_dia, [ALL_CU]
+    def as_list(self):
+        return ["pad", "", "np_thru_hole", "circle", ["at", self.x, self.y], ["size", self.hole_dia, self.hole_dia], ["drill", self.hole_dia], ["layers"] + self.layers]
 
 class Pad(Element):
     def __init__(self, name, x, y, w, h, layers=None):
