@@ -2,6 +2,8 @@
 # Python script, that specifies all parts, connections, and
 # footprints.
 
+import re
+
 nets = {}
 components = {}
 
@@ -67,9 +69,10 @@ def dump_netlist(fn):
         ["components", export_components],
         ["nets", export_nets],
     ])
+    print "Saved netlist to %s" % fn
 
 class Component:
-    def __init__(self, identifier, footprint, value, pins):
+    def __init__(self, identifier, footprint, value, pins, buses=None):
         # autonumber identifiers
         if identifier.find("?") != -1:
             counter = 1
@@ -85,12 +88,23 @@ class Component:
 
         self.footprint = footprint
         self.value = value
+        self.buses = buses
 
         self.pins = pins
         for pin in self.pins:
             pin.component = self
             for net in pin.nets:
                 nets.setdefault(net, []).append(pin)
+
+    def xilinx_pins_by_net(self):
+        r = {}
+        for pin in self.pins:
+            for net in pin.nets:
+                for bus in self.buses:
+                    if net.startswith(bus):
+                        net = "%s<%s>" % (net[:len(bus)], net[len(bus):])
+                r.setdefault(net, []).append(pin.number)
+        return r
 
 class Pin:
     def __init__(self, number, name, nets=None):
@@ -122,3 +136,44 @@ def R0805(value, net1, net2):
             Pin(2, "2", [net2]),
         ],
     )
+
+def update_xilinx_constraints(xilinx, fn):
+    print "Updating constraints file %s" % fn
+    changed = False
+    lines = []
+    seen = set()
+    nets = xilinx.xilinx_pins_by_net()
+    for line in open(fn):
+        line = line.rstrip()
+        m = re.search(r"^NET (.*?) LOC = P(\d+);$", line)
+        if m:
+            net = m.group(1)
+            pin = int(m.group(2))
+            seen.add(net)
+            if not nets.has_key(net):
+                print "WARNING: unknown net specified in Xilinx constraints line: %s" % line
+            elif len(nets[net]) > 1:
+                print "WARNING: more than one pin assigned to Xilinx net %s" % net
+            elif int(nets[net][0]) == pin:
+                print "OK: pin %d is still assigned to Xilinx net %s" % (pin, net)
+            else:
+                print "CHANGED: Xilinx net %s is now on pin %d" % (net, nets[net][0])
+                line = "NET %s LOC = P%d;" % (net, nets[net][0])
+                changed = True
+        lines.append(line)
+    for net, pins in sorted(nets.items()):
+        if net in seen:
+            continue
+        if net in ('3V3', 'GND', 'cpld_TCK', 'cpld_TDO', 'cpld_TDI', 'cpld_TMS'):
+            continue
+        if len(pins) > 1:
+            print "WARNING: can't add net %s to Xilinx constraints file because it's connected to more than one pin: %s" % (net, `pins`)
+        else:
+            print "CHANGED: Add Xilinx net %s (pin %d) to constraints file" % (net, pins[0])
+            lines.append("NET %s LOC = P%d;" % (net, pins[0]))
+            changed = True
+    if changed:
+        f = open(fn, 'w')
+        for line in lines:
+            print>>f, line
+        print "Xilinx constraints updated in %s" % fn
