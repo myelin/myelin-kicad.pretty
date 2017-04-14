@@ -5,6 +5,8 @@ from myelin_kicad_mod import *
 # http://www.digikey.com/product-detail/en/5530843-4/A31717-ND/770543?curr=usd&WT.z_cid=ref_octopart_dkc_buynow&site=us
 # http://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocNm=5530843&DocType=Customer+Drawing&DocLang=English
 
+# C = card slot width = 2.3" = 58.42
+
 X = Module(
 	identifier="acorn_electron_cartridge_socket",
 	description="AMP-5530843-4 used as Acorn Electron cartridge socket",
