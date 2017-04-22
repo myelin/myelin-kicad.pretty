@@ -20,6 +20,10 @@ PAD_SPACING = 2.54
 #   the Plus 1 socket, so bumping it up from there would be nice.
 # - From acorn_electron_cartridge_socket.py:
 #   C = card slot width = 2.3" = 58.42
+# - I took some measurements from a Hopper ROM PCB:
+#   http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=12815&sid=657881ef80e2a1f0ad344db906e2f12f#p166861
+#   The board in there is 2.25" (57.15 mm) wide, so 57mm should be
+#   just about perfect.
 
 CONNECTOR_WIDTH = 57.0
 CHAMFER = 1
