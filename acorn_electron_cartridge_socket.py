@@ -20,7 +20,7 @@ X = Module(
 N = 44
 
 # pad and hole diameters
-PAD_DIA = 0.070 * INCH
+PAD_DIA = 0.060 * INCH
 HOLE_DIA = 0.040 * INCH
 
 # distance between rows
