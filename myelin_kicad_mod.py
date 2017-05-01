@@ -8,16 +8,17 @@ BACK_CU = "B.Cu"
 FRONT_SILK = "F.SilkS"
 BACK_SILK = "B.SilkS"
 FRONT_PASTE = "F.Paste"
+BACK_PASTE = "B.Paste"
 ALL_MASK = "*.Mask" # for pins that go all the way through
 FRONT_MASK = "F.Mask"
 BACK_MASK = "B.Mask"
 EDGE_CUTS = "Edge.Cuts"
 # standard layer sets for pins and pads
 FRONT_PIN = [ALL_CU, ALL_MASK, FRONT_SILK]
-FRONT_PAD = [FRONT_CU, FRONT_MASK, FRONT_SILK]
+FRONT_PAD = [FRONT_CU, FRONT_MASK, FRONT_PASTE]
 FRONT_TEXT = [FRONT_SILK]
 BACK_TEXT = [BACK_SILK]
-BACK_PAD = [BACK_CU, BACK_MASK, BACK_SILK]
+BACK_PAD = [BACK_CU, BACK_MASK, BACK_PASTE]
 EDGE = [EDGE_CUTS]
 
 # format python list into kicad netlist format
@@ -43,21 +44,22 @@ class Element:
     pass
 
 class Text(Element):
-    def __init__(self, x, y, text, kind='user', layers=None, rotation=0, mirror=False, bottom=False):
+    def __init__(self, x, y, text, kind='user', layers=None, rotation=0, mirror=False, bottom=False, hide=False):
         if layers is None: layers = FRONT_TEXT
         if bottom:
             # shortcut to get text on the bottom layer
             mirror=True
             layers=BACK_TEXT
-        self.x, self.y, self.text, self.kind, self.layers, self.rotation, self.mirror = (
-            x, y, text, kind, layers[:], rotation, mirror)
+        self.x, self.y, self.text, self.kind, self.layers, self.rotation, self.mirror, self.hide = (
+            x, y, text, kind, layers[:], rotation, mirror, hide)
     def as_list(self):
         effects = ["effects", ["font", ["size", 1, 1], ["thickness", 0.15]]]
         if self.mirror:
             effects.append(["justify", "mirror"])
-        return ["fp_text", self.kind, self.text, ["at", self.x, self.y, self.rotation], ["layer"] + self.layers,
-            effects
-        ]
+        fp_text = ["fp_text", self.kind, self.text, ["at", self.x, self.y, self.rotation], ["layer"] + self.layers]
+        if self.hide: fp_text.append("hide")
+        fp_text.append(effects)
+        return fp_text
 
 class Line(Element):
     def __init__(self, x0, y0, x1, y1, layers=None):
@@ -74,11 +76,22 @@ class Circle(Element):
         return ["fp_circle", ["center", self.x0, self.y0], ["end", self.x0, self.y0 + self.r], ["layer"] + self.layers, ["width", "0.15"]]
 
 class Pin(Element):
-    def __init__(self, name, x, y, dia, hole_dia, layers=None, square=False):
+    def __init__(self, name, x, y, dia, hole_dia, layers=None, square=False, solid_connect=False):
         if layers is None: layers = FRONT_PIN
-        self.name, self.x, self.y, self.dia, self.hole_dia, self.layers, self.square = name, x, y, dia, hole_dia, layers[:], square
+        self.name, self.x, self.y, self.dia, self.hole_dia, self.layers, self.square, self.solid_connect = (
+            name, x, y, dia, hole_dia, layers[:], square, solid_connect)
     def as_list(self):
-        return ["pad", self.name, "thru_hole", "rect" if self.square else "circle", ["at", self.x, self.y], ["size", self.dia, self.dia], ["drill", self.hole_dia], ["layers"] + self.layers]
+        r = [
+            "pad", self.name, "thru_hole",
+            "rect" if self.square else "circle",
+            ["at", self.x, self.y],
+            ["size", self.dia, self.dia],
+            ["drill", self.hole_dia],
+            ["layers"] + self.layers,
+        ]
+        if self.solid_connect:
+            r.append(["zone_connect", 2])
+        return r
 
 class Hole(Pin):
     def __init__(self, x, y, hole_dia):
@@ -100,15 +113,12 @@ class Pad(Element):
         return ["pad", self.name, "smd", "rect", ["at", self.x, self.y], ["size", self.w, self.h], ["layers"] + self.layers]
 
 class Module:
-    def __init__(self, identifier, description, ref_x=0, ref_y=-1, value_x=0, value_y=1):
+    def __init__(self, identifier, description, ref_x=0, ref_y=-1, value_x=0, value_y=1, silkscreen=True):
         self.identifier = identifier
         self.description = description
-        self.ref_text = Text(ref_x, ref_y, "REF**", "reference")
-        self.value_text = Text(value_x, value_y, self.identifier, "value")
-        self.elements = [
-            self.ref_text,
-            self.value_text,
-        ]
+        self.ref_text = Text(ref_x, ref_y, "REF**", "reference", hide=not silkscreen)
+        self.value_text = Text(value_x, value_y, self.identifier, "value", hide=not silkscreen)
+        self.elements = [self.ref_text, self.value_text]
 
     def add(self, element):
         self.elements.append(element)

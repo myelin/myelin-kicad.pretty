@@ -9,7 +9,7 @@ X = Module(
 SOLDERING_MARGIN_OUT = 1 # extend everything out for ease of soldering
 SOLDERING_MARGIN_IN = 0 # extend underneath the chip a bit to soak up solder
 
-# 44 pins
+# 32 pins
 N = 32
 
 # plastic chip dimensions
