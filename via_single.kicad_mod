@@ -1,0 +1,6 @@
+(module
+via_single
+(descr "Via array for stapling planes together")
+(fp_text reference REF** (at 0 -1 0) (layer F.SilkS) hide (effects (font (size 1 1) (thickness 0.15))))
+(fp_text value via_single (at 0 1 0) (layer F.SilkS) hide (effects (font (size 1 1) (thickness 0.15))))
+(pad 1 thru_hole circle (at 0 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu) (zone_connect 2)))
