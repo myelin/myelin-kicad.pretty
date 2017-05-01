@@ -10,7 +10,7 @@ components = {}
 # format list entry for dump_list()
 def fmt_item(item):
     if type(item) == type(""):
-        if item.find(" ") != -1:
+        if not len(item) or item.find(" ") != -1:
             return '"%s"' % item.replace('"', "'") # munge
     return str(item)
 
