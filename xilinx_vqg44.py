@@ -23,7 +23,7 @@ D1 = E1 = 12.0
 # pin 1 ID is a bubble in the top left corner
 PIN_SPACING = 0.8
 PIN_WIDTH = 0.37
-PAD_WIDTH = 0.5
+PAD_WIDTH = 0.5  # 0.13mm extra over the pin width, allowing 0.3mm (12 mil) between pads
 
 # draw outline
 X.add(Line(-D/2, -E/2, -D/2, E/2))
