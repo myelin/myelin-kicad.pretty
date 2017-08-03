@@ -1,6 +1,5 @@
 from myelin_kicad_mod import *
 
-# SST 32-pin PLCC NH package, e.g. for SST39SF010A-*-NHE
 X = Module(
     identifier="bbc_1mhz_bus_board",
     description="Board that fits nicely into the 1MHz bus socket under a BBC Model B",
