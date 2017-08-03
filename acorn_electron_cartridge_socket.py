@@ -7,6 +7,10 @@ from myelin_kicad_mod import *
 
 # C = card slot width = 2.3" = 58.42
 
+# actual Electron cartridges are 57mm wide, so they need to be positioned
+# carefully to avoid shorts / open circuits when plugged into one of these
+# sockets.
+
 X = Module(
 	identifier="acorn_electron_cartridge_socket",
 	description="AMP-5530843-4 used as Acorn Electron cartridge socket",
