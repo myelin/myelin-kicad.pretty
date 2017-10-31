@@ -24,8 +24,11 @@ PAD_SPACING = 2.54
 #   http://www.stardot.org.uk/forums/viewtopic.php?f=3&t=12815&sid=657881ef80e2a1f0ad344db906e2f12f#p166861
 #   The board in there is 2.25" (57.15 mm) wide, so 57mm should be
 #   just about perfect.
+# - Boards I've fabbed at 57mm work in the Plus 1 but not a Master 128.
+#   MartinB says his Master carts are 56.4mm.
+#   Changed to 56.5mm in Oct 2017.
 
-CONNECTOR_WIDTH = 57.0
+CONNECTOR_WIDTH = 56.5
 CHAMFER = 1
 
 # When installed in an Electron, the bottom 31mm of PCB are inside the Plus 1
@@ -74,7 +77,7 @@ X.add(Line(CONNECTOR_WIDTH/2, PAD_H/2 - CHAMFER, CONNECTOR_WIDTH/2, -PAD_H/2, la
 for pin in range(N/2):
 	x = (pin - float(N/2 - 1)/2) * PAD_SPACING
 	y = 0
-	X.add(Pad(name="A%d" % (pin+1), x=x, y=y, w=PAD_W, h=PAD_H, layers=FRONT_PAD))
-	X.add(Pad(name="B%d" % (pin+1), x=x, y=y, w=PAD_W, h=PAD_H, layers=BACK_PAD))
+	X.add(Pad(name="A%d" % (pin+1), x=x, y=y, w=PAD_W, h=PAD_H, layers=FRONT_PAD_NOPASTE))
+	X.add(Pad(name="B%d" % (pin+1), x=x, y=y, w=PAD_W, h=PAD_H, layers=BACK_PAD_NOPASTE))
 
 X.save()

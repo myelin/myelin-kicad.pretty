@@ -100,9 +100,10 @@ class Component:
         r = {}
         for pin in self.pins:
             for net in pin.nets:
-                for bus in self.buses:
-                    if net.startswith(bus):
-                        net = "%s<%s>" % (net[:len(bus)], net[len(bus):])
+                if self.buses:
+                    for bus in self.buses:
+                        if net.startswith(bus):
+                            net = "%s<%s>" % (net[:len(bus)], net[len(bus):])
                 r.setdefault(net, []).append(pin.number)
         return r
 
@@ -126,10 +127,10 @@ def C0805(value, net1, net2, ref="C?"):
     )
 
 # 0805 resistor
-def R0805(value, net1, net2):
+def R0805(value, net1, net2, ref="R?"):
     return Component(
         footprint="Resistors_SMD:R_0805_HandSoldering",
-        identifier="R?",
+        identifier=ref,
         value=value,
         pins=[
             Pin(1, "1", [net1]),

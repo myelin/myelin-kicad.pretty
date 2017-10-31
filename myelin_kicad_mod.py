@@ -14,11 +14,13 @@ FRONT_MASK = "F.Mask"
 BACK_MASK = "B.Mask"
 EDGE_CUTS = "Edge.Cuts"
 # standard layer sets for pins and pads
-FRONT_PIN = [ALL_CU, ALL_MASK, FRONT_SILK]
+FRONT_PIN = [ALL_CU, ALL_MASK]
 FRONT_PAD = [FRONT_CU, FRONT_MASK, FRONT_PASTE]
+FRONT_PAD_NOPASTE = [FRONT_CU, FRONT_MASK]
 FRONT_TEXT = [FRONT_SILK]
 BACK_TEXT = [BACK_SILK]
 BACK_PAD = [BACK_CU, BACK_MASK, BACK_PASTE]
+BACK_PAD_NOPASTE = [BACK_CU, BACK_MASK]
 EDGE = [EDGE_CUTS]
 
 # format python list into kicad netlist format
@@ -44,16 +46,16 @@ class Element:
     pass
 
 class Text(Element):
-    def __init__(self, x, y, text, kind='user', layers=None, rotation=0, mirror=False, bottom=False, hide=False):
+    def __init__(self, x, y, text, kind='user', layers=None, rotation=0, mirror=False, bottom=False, hide=False, size=1):
         if layers is None: layers = FRONT_TEXT
         if bottom:
             # shortcut to get text on the bottom layer
             mirror=True
             layers=BACK_TEXT
-        self.x, self.y, self.text, self.kind, self.layers, self.rotation, self.mirror, self.hide = (
-            x, y, text, kind, layers[:], rotation, mirror, hide)
+        self.x, self.y, self.text, self.kind, self.layers, self.rotation, self.mirror, self.hide, self.size = (
+            x, y, text, kind, layers[:], rotation, mirror, hide, size)
     def as_list(self):
-        effects = ["effects", ["font", ["size", 1, 1], ["thickness", 0.15]]]
+        effects = ["effects", ["font", ["size", self.size, self.size], ["thickness", 0.15]]]
         if self.mirror:
             effects.append(["justify", "mirror"])
         fp_text = ["fp_text", self.kind, self.text, ["at", self.x, self.y, self.rotation], ["layer"] + self.layers]
@@ -134,3 +136,9 @@ class Module:
             "module", self.identifier,
             ["descr", self.description],
         ] + [element.as_list() for element in self.elements]
+
+def x_width_from_lr(left, right):
+    return (
+        (left + right) / 2,
+        abs(right - left),
+    )
