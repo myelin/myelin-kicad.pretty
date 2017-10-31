@@ -78,7 +78,8 @@ class Circle(Element):
         return ["fp_circle", ["center", self.x0, self.y0], ["end", self.x0, self.y0 + self.r], ["layer"] + self.layers, ["width", "0.15"]]
 
 class Pin(Element):
-    def __init__(self, name, x, y, dia, hole_dia, layers=None, square=False, solid_connect=False):
+    def __init__(self, name, x, y, dia, hole_dia=None, layers=None, square=False, solid_connect=False):
+        if hole_dia is None: hole_dia = dia  # non-plated hole
         if layers is None: layers = FRONT_PIN
         self.name, self.x, self.y, self.dia, self.hole_dia, self.layers, self.square, self.solid_connect = (
             name, x, y, dia, hole_dia, layers[:], square, solid_connect)

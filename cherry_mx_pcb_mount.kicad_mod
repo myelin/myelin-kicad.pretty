@@ -1,0 +1,18 @@
+(module
+cherry_mx_pcb_mount
+(descr "Cherry MX keyswitch (PCB mount)")
+(fp_text reference REF** (at 0 3.5 0) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.15))))
+(fp_text value cherry_mx_pcb_mount (at 0 5.5 0) (layer F.SilkS) (effects (font (size 1 1) (thickness 0.15))))
+(fp_line (start -6.5 -6.5) (end -6.5 6.5) (layer F.SilkS) (width 0.15))
+(fp_line (start -6.5 6.5) (end 6.5 6.5) (layer F.SilkS) (width 0.15))
+(fp_line (start 6.5 6.5) (end 6.5 -6.5) (layer F.SilkS) (width 0.15))
+(fp_line (start 6.5 -6.5) (end -6.5 -6.5) (layer F.SilkS) (width 0.15))
+(fp_line (start -7.8 -7.8) (end -7.8 7.8) (layer F.SilkS) (width 0.15))
+(fp_line (start -7.8 7.8) (end 7.8 7.8) (layer F.SilkS) (width 0.15))
+(fp_line (start 7.8 7.8) (end 7.8 -7.8) (layer F.SilkS) (width 0.15))
+(fp_line (start 7.8 -7.8) (end -7.8 -7.8) (layer F.SilkS) (width 0.15))
+(pad M0 thru_hole circle (at 0 0) (size 3.9878 3.9878) (drill 3.9878) (layers *.Cu *.Mask))
+(pad M1 thru_hole circle (at -5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
+(pad M2 thru_hole circle (at 5.08 0) (size 1.7018 1.7018) (drill 1.7018) (layers *.Cu *.Mask))
+(pad 1 thru_hole circle (at -3.81 -2.54) (size 2.4986 2.4986) (drill 1.4986) (layers *.Cu *.Mask))
+(pad 2 thru_hole circle (at 2.54 -5.08) (size 2.4986 2.4986) (drill 1.4986) (layers *.Cu *.Mask)))
