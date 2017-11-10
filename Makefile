@@ -1,6 +1,7 @@
 OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	bbc_1mhz_bus_board.kicad_mod \
 	cherry_mx_pcb_mount.kicad_mod \
+	din_5_econet_pcb_mount.kicad_mod \
 	issi_32l_450mil_sop.kicad_mod \
 	fci_sd_card_socket.kicad_mod \
 	hirose_micro_sd_card_socket.kicad_mod \
