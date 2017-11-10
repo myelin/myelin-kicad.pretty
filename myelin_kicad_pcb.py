@@ -90,6 +90,12 @@ class Component:
         self.value = value
         self.buses = buses
 
+        if type(pins) == type({}):
+            pins = [
+                Pin(pin_id, "", pin_nets)
+                for pin_id, pin_nets in sorted(pins.items())
+            ]
+
         self.pins = pins
         for pin in self.pins:
             pin.component = self
@@ -135,6 +141,18 @@ def R0805(value, net1, net2, ref="R?"):
         pins=[
             Pin(1, "1", [net1]),
             Pin(2, "2", [net2]),
+        ],
+    )
+
+# SOD-323 diode
+def DSOD323(value, net_cathode, net_anode, ref="D?"):
+    return Component(
+        footprint="Diodes_SMD:D_SOD-323_HandSoldering",
+        identifier=ref,
+        value=value,
+        pins=[
+            Pin(1, "1", net_cathode),
+            Pin(2, "2", net_anode),
         ],
     )
 
