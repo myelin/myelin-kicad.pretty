@@ -4,15 +4,15 @@ from myelin_kicad_mod import *
 
 X = Module(
 	identifier="bbc_master_econet_module",
-	description="Sparkfun Pro Micro ATMEGA32U4"
+	description="BBC Master Econet Module 01-ADF10 pin landing pattern"
 )
 
 # pad and hole diameters
 PAD_DIA = 0.070 * INCH
 HOLE_DIA = 0.040 * INCH
 
-# two rows of pins, 2.1" separated vertically
-HEIGHT = 2.1 * INCH
+# two rows of pins, 44mm separated vertically
+HEIGHT = 44
 WIDTH = 1.7 * INCH
 
 # top row: 5 pins
