@@ -72,7 +72,8 @@ def dump_netlist(fn):
     print "Saved netlist to %s" % fn
 
 class Component:
-    def __init__(self, identifier, footprint, value, pins, buses=None):
+    def __init__(self, identifier, footprint, value, pins=None, buses=None):
+        if pins is None: pins = []
         # autonumber identifiers
         if identifier.find("?") != -1:
             counter = 1
