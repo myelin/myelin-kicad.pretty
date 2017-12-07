@@ -122,9 +122,9 @@ class Pin:
         self.number, self.name, self.nets = number, name, nets
 
 # 0805 capacitor
-def C0805(value, net1, net2, ref="C?"):
+def C0805(value, net1, net2, ref="C?", handsoldering=True):
     return Component(
-        footprint="Capacitors_SMD:C_0805_HandSoldering",
+        footprint="Capacitors_SMD:C_0805_HandSoldering" if handsoldering else "Capacitors_SMD:C_0805",
         identifier=ref,
         value=value,
         pins=[
@@ -134,9 +134,9 @@ def C0805(value, net1, net2, ref="C?"):
     )
 
 # 0805 resistor
-def R0805(value, net1, net2, ref="R?"):
+def R0805(value, net1, net2, ref="R?", handsoldering=True):
     return Component(
-        footprint="Resistors_SMD:R_0805_HandSoldering",
+        footprint="Resistors_SMD:R_0805_HandSoldering" if handsoldering else "Resistors_SMD:R_0805",
         identifier=ref,
         value=value,
         pins=[
