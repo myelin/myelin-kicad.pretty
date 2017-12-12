@@ -8,6 +8,7 @@ OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	issi_32l_450mil_sop.kicad_mod \
 	fci_sd_card_socket.kicad_mod \
 	hirose_micro_sd_card_socket.kicad_mod \
+	lattice_ubga169.kicad_mod \
 	lcsoft_mini_flipped.kicad_mod \
 	micro_usb_b_smd_molex.kicad_mod \
 	pro_micro.kicad_mod \

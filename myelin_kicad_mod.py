@@ -103,9 +103,10 @@ class Hole(Pin):
         return ["pad", "", "np_thru_hole", "circle", ["at", self.x, self.y], ["size", self.hole_dia, self.hole_dia], ["drill", self.hole_dia], ["layers"] + self.layers]
 
 class Pad(Element):
-    def __init__(self, name, x, y, w, h, layers=None):
+    def __init__(self, name, x, y, w, h, layers=None, shape='rect'):
         if layers is None: layers = FRONT_PAD
-        self.name, self.x, self.y, self.w, self.h, self.layers = name, x, y, w, h, layers[:]
+        self.name, self.x, self.y, self.w, self.h, self.layers, self.shape = (
+            name, x, y, w, h, layers[:], shape)
     def rotate(self, degrees):
         # rotate counterclockwise around the origin in increments of 90 degrees
         for r in range(int(degrees / 90.0)):
@@ -113,7 +114,7 @@ class Pad(Element):
             self.w, self.h = self.h, self.w
         return self # allow chaining
     def as_list(self):
-        return ["pad", self.name, "smd", "rect", ["at", self.x, self.y], ["size", self.w, self.h], ["layers"] + self.layers]
+        return ["pad", self.name, "smd", self.shape, ["at", self.x, self.y], ["size", self.w, self.h], ["layers"] + self.layers]
 
 class Module:
     def __init__(self, identifier, description, ref_x=0, ref_y=-1, value_x=0, value_y=1, silkscreen=True):
