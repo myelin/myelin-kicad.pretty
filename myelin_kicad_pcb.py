@@ -98,7 +98,11 @@ class Component:
             ]
 
         self.pins = pins
+        seen_pins = {}
         for pin in self.pins:
+            if seen_pins.has_key(pin.number):
+                raise Exception("Pin %s seen twice" % pin.number)
+            seen_pins[pin.number] = pin
             pin.component = self
             for net in pin.nets:
                 nets.setdefault(net, []).append(pin)
@@ -125,6 +129,18 @@ class Pin:
 def C0805(value, net1, net2, ref="C?", handsoldering=True):
     return Component(
         footprint="Capacitors_SMD:C_0805_HandSoldering" if handsoldering else "Capacitors_SMD:C_0805",
+        identifier=ref,
+        value=value,
+        pins=[
+            Pin(1, "1", [net1]),
+            Pin(2, "2", [net2]),
+        ],
+    )
+
+# 0402 capacitor
+def C0402(value, net1, net2, ref="C?"):
+    return Component(
+        footprint="Capacitors_SMD:C_0402",
         identifier=ref,
         value=value,
         pins=[
