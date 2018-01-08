@@ -71,8 +71,17 @@ def dump_netlist(fn):
     ])
     print "Saved netlist to %s" % fn
 
+def dump_bom(fn):
+    list = []
+    for identifier, component in sorted(components.items()):
+        list.append([identifier, component.value, component.desc, component.footprint])
+    f = open(fn, "w")
+    for line in list:
+        print>>f, "\t".join(line)
+    print "Saved BOM to %s" % fn
+
 class Component:
-    def __init__(self, identifier, footprint, value, pins=None, buses=None):
+    def __init__(self, identifier, footprint, value, pins=None, buses=None, desc=None):
         if pins is None: pins = []
         # autonumber identifiers
         if identifier.find("?") != -1:
@@ -88,6 +97,7 @@ class Component:
         components[self.identifier] = self
 
         self.footprint = footprint
+        self.desc = desc if desc else ""
         self.value = value
         self.buses = buses
 
@@ -131,6 +141,7 @@ def C0805(value, net1, net2, ref="C?", handsoldering=True):
         footprint="Capacitors_SMD:C_0805_HandSoldering" if handsoldering else "Capacitors_SMD:C_0805",
         identifier=ref,
         value=value,
+        desc="%s capacitor in 0805 package" % value,
         pins=[
             Pin(1, "1", [net1]),
             Pin(2, "2", [net2]),
@@ -143,6 +154,7 @@ def C0402(value, net1, net2, ref="C?"):
         footprint="Capacitors_SMD:C_0402",
         identifier=ref,
         value=value,
+        desc="%s capacitor in 0402 package" % value,
         pins=[
             Pin(1, "1", [net1]),
             Pin(2, "2", [net2]),
@@ -155,6 +167,7 @@ def R0805(value, net1, net2, ref="R?", handsoldering=True):
         footprint="Resistors_SMD:R_0805_HandSoldering" if handsoldering else "Resistors_SMD:R_0805",
         identifier=ref,
         value=value,
+        desc="%s resistor in 0805 package" % value,
         pins=[
             Pin(1, "1", [net1]),
             Pin(2, "2", [net2]),
@@ -167,6 +180,7 @@ def DSOD323(value, net_cathode, net_anode, ref="D?"):
         footprint="Diodes_SMD:D_SOD-323_HandSoldering",
         identifier=ref,
         value=value,
+        desc="%s diode in SOD323 package" % value,
         pins=[
             Pin(1, "1", net_cathode),
             Pin(2, "2", net_anode),
