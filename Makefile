@@ -13,6 +13,7 @@ OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	lcsoft_mini_flipped.kicad_mod \
 	micro_usb_b_smd_molex.kicad_mod \
 	pro_micro.kicad_mod \
+	raspberry_pi_zero_flipped.kicad_mod \
 	sst_plcc32_nh.kicad_mod \
 	usb_a_host_pth_amphenol.kicad_mod \
 	via_single.kicad_mod \

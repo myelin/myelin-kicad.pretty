@@ -11,7 +11,7 @@ X = Module(
 )
 
 # big holes for header pins
-PAD_DIA = 0.070 * INCH
+PAD_DIA = 0.060 * INCH
 HOLE_DIA = 0.040 * INCH
 
 # origin at the center of the top edge of the Pi Zero module, so we'll go out to
