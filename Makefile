@@ -3,7 +3,6 @@ OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	bbc_master_econet_module.kicad_mod \
 	cherry_mx_pcb_mount.kicad_mod \
 	din_5_econet_pcb_mount.kicad_mod \
-	header_2x07_100mil.kicad_mod \
 	header_2x20_100mil.kicad_mod \
 	issi_32l_450mil_sop.kicad_mod \
 	fci_sd_card_socket.kicad_mod \
