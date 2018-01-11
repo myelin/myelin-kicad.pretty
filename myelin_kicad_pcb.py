@@ -71,10 +71,18 @@ def dump_netlist(fn):
     ])
     print "Saved netlist to %s" % fn
 
-def dump_bom(fn):
-    list = []
+def dump_bom(fn, readable_fn):
+    list = [["Identifier", "Value", "Description", "KiCad package"]]
+    rf = open(readable_fn, "w")
+    print>>rf, """This is the human-readable bill of materials.
+See %s for a terser version suitable for spreadsheet import.
+""" % fn
     for identifier, component in sorted(components.items()):
-        list.append([identifier, component.value, component.desc, component.footprint])
+        if component.footprint == "myelin-kicad:via_single":
+            continue
+        item = [identifier, component.value, component.desc, component.footprint]
+        list.append(item)
+        print>>rf, "%s\n- Value: %s\n- Description: %s\n- KiCad package: %s\n" % tuple(item)
     f = open(fn, "w")
     for line in list:
         print>>f, "\t".join(line)
