@@ -1,8 +1,8 @@
 from myelin_kicad_mod import *
 
 X = Module(
-	identifier="lattice_ubga169",
-	description="UBGA169 for Lattice Max 10 FPGAs"
+	identifier="intel_ubga169",
+	description="UBGA169 for Intel Max 10 FPGAs"
 )
 
 # plastic chip is 11 mm x 11 mm
