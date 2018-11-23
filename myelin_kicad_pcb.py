@@ -123,6 +123,7 @@ class Component:
             seen_pins[pin.number] = pin
             pin.component = self
             for net in pin.nets:
+                if not net: continue  # ignore net ""
                 nets.setdefault(net, []).append(pin)
 
     def xilinx_pins_by_net(self):
@@ -146,7 +147,7 @@ class Pin:
 # 0805 capacitor
 def C0805(value, net1, net2, ref="C?", handsoldering=True):
     return Component(
-        footprint="Capacitors_SMD:C_0805_HandSoldering" if handsoldering else "Capacitors_SMD:C_0805",
+        footprint="Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" if handsoldering else "Capacitor_SMD:C_0805_2012Metric",
         identifier=ref,
         value=value,
         desc="%s capacitor in 0805 package" % value,

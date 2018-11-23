@@ -103,10 +103,11 @@ class Hole(Pin):
         return ["pad", "", "np_thru_hole", "circle", ["at", self.x, self.y], ["size", self.hole_dia, self.hole_dia], ["drill", self.hole_dia], ["layers"] + self.layers]
 
 class Pad(Element):
-    def __init__(self, name, x, y, w, h, layers=None, shape='rect'):
+    def __init__(self, name, x, y, w, h, layers=None, shape='rect', solder_mask_margin=0, pad_clearance=0):
         if layers is None: layers = FRONT_PAD
-        self.name, self.x, self.y, self.w, self.h, self.layers, self.shape = (
-            name, x, y, w, h, layers[:], shape)
+        self.name, self.x, self.y, self.w, self.h, self.layers, self.shape, \
+            self.solder_mask_margin, self.pad_clearance = (
+            name, x, y, w, h, layers[:], shape, solder_mask_margin, pad_clearance)
     def rotate(self, degrees):
         # rotate counterclockwise around the origin in increments of 90 degrees
         for r in range(int(degrees / 90.0)):
@@ -114,14 +115,24 @@ class Pad(Element):
             self.w, self.h = self.h, self.w
         return self # allow chaining
     def as_list(self):
-        return ["pad", self.name, "smd", self.shape, ["at", self.x, self.y], ["size", self.w, self.h], ["layers"] + self.layers]
+        info = ["pad", self.name,
+                "smd", self.shape,
+                ["at", self.x, self.y],
+                ["size", self.w, self.h],
+                ["layers"] + self.layers,
+               ]
+        if self.solder_mask_margin:
+            info.append(["solder_mask_margin", self.solder_mask_margin])
+        if self.pad_clearance:
+            info.append(["clearance", self.pad_clearance])
+        return info
 
 class Module:
-    def __init__(self, identifier, description, ref_x=0, ref_y=-1, value_x=0, value_y=1, silkscreen=True):
+    def __init__(self, identifier, description, ref_x=0, ref_y=-1, ref_rotate=0, value_x=0, value_y=1, value_rotate=0, silkscreen=True):
         self.identifier = identifier
         self.description = description
-        self.ref_text = Text(ref_x, ref_y, "REF**", "reference", hide=not silkscreen)
-        self.value_text = Text(value_x, value_y, self.identifier, "value", hide=not silkscreen)
+        self.ref_text = Text(ref_x, ref_y, "REF**", "reference", hide=not silkscreen, rotation=ref_rotate)
+        self.value_text = Text(value_x, value_y, self.identifier, "value", hide=not silkscreen, rotation=value_rotate)
         self.elements = [self.ref_text, self.value_text]
 
     def add(self, element):
