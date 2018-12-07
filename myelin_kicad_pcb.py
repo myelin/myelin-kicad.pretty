@@ -3,6 +3,7 @@
 # footprints.
 
 import re
+import types
 
 nets = {}
 components = {}
@@ -160,7 +161,7 @@ def C0805(value, net1, net2, ref="C?", handsoldering=True):
 # 0402 capacitor
 def C0402(value, net1, net2, ref="C?"):
     return Component(
-        footprint="Capacitors_SMD:C_0402",
+        footprint="Capacitor_SMD:C_0402_1005Metric",
         identifier=ref,
         value=value,
         desc="%s capacitor in 0402 package" % value,
@@ -173,7 +174,7 @@ def C0402(value, net1, net2, ref="C?"):
 # 0805 resistor
 def R0805(value, net1, net2, ref="R?", handsoldering=True):
     return Component(
-        footprint="Resistors_SMD:R_0805_HandSoldering" if handsoldering else "Resistors_SMD:R_0805",
+        footprint="Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" if handsoldering else "Resistor_SMD:R_0805_2012Metric",
         identifier=ref,
         value=value,
         desc="%s resistor in 0805 package" % value,
@@ -196,6 +197,11 @@ def DSOD323(value, net_cathode, net_anode, ref="D?"):
         ],
     )
 
+def pin_to_loc(pin_id):
+    if type(pin_id) == types.IntType:
+        return "P%d" % pin_id
+    return pin_id
+
 def update_xilinx_constraints(xilinx, fn):
     print "Updating constraints file %s" % fn
     changed = False
@@ -204,20 +210,21 @@ def update_xilinx_constraints(xilinx, fn):
     nets = xilinx.xilinx_pins_by_net()
     for line in open(fn):
         line = line.rstrip()
-        m = re.search(r"^NET (.*?) LOC = P(\d+);$", line)
+        m = re.search(r"^NET (.*?) LOC = (.*?);$", line)
         if m:
             net = m.group(1)
-            pin = int(m.group(2))
+            pin = m.group(2)
             seen.add(net)
             if not nets.has_key(net):
                 print "WARNING: unknown net specified in Xilinx constraints line: %s" % line
             elif len(nets[net]) > 1:
                 print "WARNING: more than one pin assigned to Xilinx net %s" % net
-            elif int(nets[net][0]) == pin:
-                print "OK: pin %d is still assigned to Xilinx net %s" % (pin, net)
+            elif nets[net][0] == pin:
+                print "OK: pin %s is still assigned to Xilinx net %s" % (pin, net)
             else:
-                print "CHANGED: Xilinx net %s is now on pin %d" % (net, nets[net][0])
-                line = "NET %s LOC = P%d;" % (net, nets[net][0])
+                pin_id = nets[net][0]
+                print "CHANGED: Xilinx net %s is now on pin %s" % (net, pin_id)
+                line = "NET %s LOC = %s;" % (net, pin_to_loc(pin_id))
                 changed = True
         lines.append(line)
     for net, pins in sorted(nets.items()):
@@ -228,8 +235,8 @@ def update_xilinx_constraints(xilinx, fn):
         if len(pins) > 1:
             print "WARNING: can't add net %s to Xilinx constraints file because it's connected to more than one pin: %s" % (net, `pins`)
         else:
-            print "CHANGED: Add Xilinx net %s (pin %d) to constraints file" % (net, pins[0])
-            lines.append("NET %s LOC = P%d;" % (net, pins[0]))
+            print "CHANGED: Add Xilinx net %s (pin %s) to constraints file" % (net, pins[0])
+            lines.append("NET %s LOC = %s;" % (net, pin_to_loc(pins[0])))
             changed = True
     if changed:
         f = open(fn, 'w')
