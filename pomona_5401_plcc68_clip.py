@@ -11,13 +11,18 @@ X = Module(
 
 N_PINS = 68
 
+# Not in any datasheet, just measured and tweaked until the footprint matches.
+# Initial measurement was 31mm (1.22") but that resulted in holes slightly too close together.
+# We want the holes here to be slightly closer together so we can straighten the pins and press down to connect.
+# 1.2" is nice because it has everything on a 100mil grid.
+LINE_POS = 1.20 * INCH / 2
+
 # big holes for header pins
 PAD_DIA = 0.060 * INCH
 HOLE_DIA = 0.040 * INCH
 
 SPACING = 2.54
 
-LINE_POS = 1.22 * INCH / 2
 OUTLINE_POS = LINE_POS + 0.1 * INCH
 
 # pins on each edge zig zag (rows offset by 1.27mm)
@@ -38,11 +43,7 @@ for realpin in range(1, N_PINS + 1):
     # rotate now
     group = int(easypin / (N_PINS / 4))
     for _ in range(group):
-        #x, y = -y, x
         x, y = y, -x
-
-        # -2, 3 -> -3, -2
-        #  x, y -> -y,  x
 
     print "real pin %d, easy pin %d, normpin %d, group %d" % (realpin, easypin, normpin, group)
 
