@@ -1,6 +1,7 @@
 OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	bbc_1mhz_bus_board.kicad_mod \
 	bbc_master_econet_module.kicad_mod \
+	bourns_cat16_j8_resistor_array.kicad_mod \
 	cherry_mx_pcb_mount.kicad_mod \
 	cypress_lae064_fbga.kicad_mod \
 	din_5_econet_pcb_mount.kicad_mod \
@@ -13,6 +14,7 @@ OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	intel_ubga169.kicad_mod \
 	lcsoft_mini_flipped.kicad_mod \
 	micro_usb_b_smd_molex.kicad_mod \
+	pomona_5401_plcc68_clip.kicad_mod \
 	pro_micro.kicad_mod \
 	raspberry_pi_zero_flipped.kicad_mod \
 	sst_plcc32_nh.kicad_mod \

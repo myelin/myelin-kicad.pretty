@@ -1,0 +1,12 @@
+(module
+via_array_1x7_55mil
+(descr "Via array for stapling planes together")
+(fp_text reference REF** (at 0 -1 0) (layer F.SilkS) hide (effects (font (size 1 1) (thickness 0.15))))
+(fp_text value via_array_1x7_55mil (at 0 1 0) (layer F.SilkS) hide (effects (font (size 1 1) (thickness 0.15))))
+(pad 1 thru_hole circle (at -4.8895 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu) (zone_connect 2))
+(pad 2 thru_hole circle (at -3.4925 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu) (zone_connect 2))
+(pad 3 thru_hole circle (at -2.0955 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu) (zone_connect 2))
+(pad 4 thru_hole circle (at -0.6985 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu) (zone_connect 2))
+(pad 5 thru_hole circle (at 0.6985 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu) (zone_connect 2))
+(pad 6 thru_hole circle (at 2.0955 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu) (zone_connect 2))
+(pad 7 thru_hole circle (at 3.4925 0) (size 0.8128 0.8128) (drill 0.3302) (layers *.Cu) (zone_connect 2)))

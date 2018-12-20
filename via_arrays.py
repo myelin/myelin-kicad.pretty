@@ -3,9 +3,9 @@ from myelin_kicad_mod import *
 VIA_PAD = 0.032 * INCH
 VIA_HOLE = 0.013 * INCH
 
-def make_straight_module(N, SPACING):
+def make_straight_module(N, SPACING, SPACING_STR=None):
 	X = Module(
-		identifier="via_single" if N == 1 else "via_array_1x%d_2.54mm" % N,
+		identifier="via_single" if N == 1 else "via_array_1x%d_%s" % (N, SPACING_STR),
 		description="Via array for stapling planes together",
 		silkscreen=False,
 	)
@@ -21,9 +21,9 @@ def make_straight_module(N, SPACING):
 		))
 	X.save()
 
-def make_zigzag_module(N, SPACING):
+def make_zigzag_module(N, SPACING, SPACING_STR=None):
 	X = Module(
-		identifier="via_zigzag_1x%d_2.54mm" % N,
+		identifier="via_zigzag_1x%d_%s" % (N, SPACING_STR),
 		description="Via array for stapling planes together",
 		silkscreen=False,
 	)
@@ -39,6 +39,7 @@ def make_zigzag_module(N, SPACING):
 		))
 	X.save()
 
-make_straight_module(N=1, SPACING=2.54)
-make_straight_module(N=22, SPACING=2.54)
-make_zigzag_module(N=44, SPACING=1.27)
+make_straight_module(1, 2.54, "2.54mm")
+make_straight_module(7, 0.055 * INCH, "55mil")
+make_straight_module(22, 2.54, "2.54mm")
+make_zigzag_module(44, 1.27, "1.27mm")
