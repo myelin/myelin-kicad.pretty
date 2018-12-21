@@ -1,8 +1,8 @@
 from myelin_kicad_mod import *
 
 X = Module(
-    identifier="cypress_lae064_fbga",
-    description="LAE064 64-ball 1.0mm BGA for flash memory"
+    identifier="lattice_ftg256_fbga",
+    description="ftg256 256-ball 1.0mm BGA for Lattice MachXO2 FPGA"
 )
 
 # References:
@@ -24,16 +24,16 @@ X = Module(
 # -> pads typ 20% smaller than ball dia, i.e. .48
 
 
-# plastic chip is 9x9mm
-D = E = 9.0
+# plastic chip size
+D = E = 17.0
 
 # ball array size
-W = 8
-H = 8
+W = 16
+H = 16
 
 
 BALL_SPACING = 1.0  # ball pitch.  ball dia is 0.6mm.
-PAD_DIA = 0.45  # diameter of copper pad
+PAD_DIA = 0.40  # diameter of copper pad
 MASK_DIA = 0.60  # diameter of opening in solder mask
 PAD_CLEARANCE = 0.1639  # mask + 3.5 mil pad clearance
 
@@ -53,7 +53,7 @@ X.add(Circle(-D/2 + 0.5, -E/2 + 0.5, 0.25))
 for y in range(H):
     for x in range(W):
         X.add(Pad(
-            name="%s%d" % ("ABCDEFGHJKLMN"[y], x + 1),
+            name="%s%d" % ("ABCDEFGHJKLMNPRT"[y], x + 1),
             x=x0 + x * BALL_SPACING,
             y=y0 + y * BALL_SPACING,
             w=PAD_DIA,
@@ -62,5 +62,6 @@ for y in range(H):
             solder_mask_margin=(MASK_DIA - PAD_DIA) / 2,
             pad_clearance=PAD_CLEARANCE,
         ))
+
 
 X.save()

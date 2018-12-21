@@ -11,6 +11,7 @@ OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	hirose_micro_sd_card_socket.kicad_mod \
 	jtag_shrouded_2x5.kicad_mod \
 	lattice_tn100.kicad_mod \
+	lattice_ftg256_fbga.kicad_mod \
 	intel_ubga169.kicad_mod \
 	lcsoft_mini_flipped.kicad_mod \
 	micro_usb_b_smd_molex.kicad_mod \
