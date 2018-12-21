@@ -31,11 +31,14 @@ D = E = 17.0
 W = 16
 H = 16
 
-
+# Values from https://www.xilinx.com/support/documentation/user_guides/ug1099-bga-device-design-rules.pdf
+# Solder mask opening slightly wider than pad, for NSMD.
+# 13+ mil gap between clearance rings (23 mil between rings) to allow two 4mil traces with 5mil spacing through.
+# 39.37 - 23 = 16.37 mil for mask opening, i.e. .4158.
 BALL_SPACING = 1.0  # ball pitch.  ball dia is 0.6mm.
-PAD_DIA = 0.40  # diameter of copper pad
-MASK_DIA = 0.60  # diameter of opening in solder mask
-PAD_CLEARANCE = 0.1639  # mask + 3.5 mil pad clearance
+PAD_DIA = 0.4  # diameter of copper pad
+MASK_DIA = 0.43  # diameter of opening in solder mask
+PAD_CLEARANCE = 0  # Just use default clearance
 
 # top left ball
 x0 = -(BALL_SPACING * (W - 1.0) / 2)
