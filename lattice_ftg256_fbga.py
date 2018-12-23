@@ -50,8 +50,10 @@ X.add(Line(-D/2, E/2, D/2, E/2))
 X.add(Line(D/2, E/2, D/2, -E/2))
 X.add(Line(D/2, -E/2, -D/2, -E/2))
 
-# draw pin 1 ID bubble
+# draw pin 1 ID bubble and chevron
 X.add(Circle(-D/2 + 0.5, -E/2 + 0.5, 0.25))
+X.add(Line(-D/2-0.5, -E/2-0.5, -D/2+1, -E/2-0.5))
+X.add(Line(-D/2-0.5, -E/2-0.5, -D/2-0.5, -E/2+1))
 
 for y in range(H):
     for x in range(W):

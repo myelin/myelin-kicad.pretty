@@ -8,6 +8,8 @@ lattice_ftg256_fbga
 (fp_line (start 8.5 8.5) (end 8.5 -8.5) (layer F.SilkS) (width 0.15))
 (fp_line (start 8.5 -8.5) (end -8.5 -8.5) (layer F.SilkS) (width 0.15))
 (fp_circle (center -8.0 -8.0) (end -8.0 -7.75) (layer F.SilkS) (width 0.15))
+(fp_line (start -9.0 -9.0) (end -7.5 -9.0) (layer F.SilkS) (width 0.15))
+(fp_line (start -9.0 -9.0) (end -9.0 -7.5) (layer F.SilkS) (width 0.15))
 (pad A1 smd circle (at -7.5 -7.5) (size 0.4 0.4) (layers F.Cu F.Mask F.Paste) (solder_mask_margin 0.015))
 (pad A2 smd circle (at -6.5 -7.5) (size 0.4 0.4) (layers F.Cu F.Mask F.Paste) (solder_mask_margin 0.015))
 (pad A3 smd circle (at -5.5 -7.5) (size 0.4 0.4) (layers F.Cu F.Mask F.Paste) (solder_mask_margin 0.015))
