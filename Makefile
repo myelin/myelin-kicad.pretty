@@ -19,6 +19,7 @@ OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	pro_micro.kicad_mod \
 	raspberry_pi_zero_flipped.kicad_mod \
 	sst_plcc32_nh.kicad_mod \
+	ti_zrd_54_pbga.kicad_mod \
 	usb_a_host_pth_amphenol.kicad_mod \
 	via_single.kicad_mod \
 	xilinx_csg144.kicad_mod \
