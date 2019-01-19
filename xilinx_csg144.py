@@ -19,6 +19,9 @@ H = 13
 #   0.13 (5mil) line width between via and land, 0.56 distance between via and land, 0.51 via, 0.25 hole
 # JLCPCB 4-layer minimums: 0.2mm via hole, 0.45mm via, 0.0889 trace/space, 0.127 via-to-trace
 
+# https://www.xilinx.com/support/documentation/user_guides/ug1099-bga-device-design-rules.pdf
+# suggests different numbers: 0.4mm pad diameter, 0.43 solder mask opening diameter.
+
 BALL_SPACING = 0.8  # ball pitch.  ball dia is ???
 PAD_DIA = 0.35  # diameter of copper pad
 MASK_DIA = 0.44  # diameter of opening in solder mask
