@@ -2,11 +2,25 @@
 # Python script, that specifies all parts, connections, and
 # footprints.
 
+import os
 import re
 import types
 
-nets = {}
-components = {}
+class PCB:
+    def __init__(self):
+        self.nets = {}
+        self.components = {}
+
+    @classmethod
+    def reset(cls):
+        cls.pcb = cls()
+
+reset = PCB.reset
+
+reset()
+
+def pcb():
+    return PCB.pcb
 
 # format list entry for dump_list()
 def fmt_item(item):
@@ -26,7 +40,7 @@ def dump_netlist(fn):
     export_components = []
     export_nets = []
 
-    for identifier, component in sorted(components.items()):
+    for identifier, component in sorted(pcb().components.items()):
         export_components.append([
             "comp", ["ref", component.identifier],
             ["value", component.value],
@@ -40,7 +54,7 @@ def dump_netlist(fn):
     nets_with_one_node = set()
 
     net_counter = 0
-    for net_id, pins in sorted(nets.items()):
+    for net_id, pins in sorted(pcb().nets.items()):
         net_case_check.setdefault(net_id.lower(), set()).add(net_id)
         net_counter += 1
         print "=== %s ===" % net_id
@@ -78,7 +92,7 @@ def dump_bom(fn, readable_fn):
     print>>rf, """This is the human-readable bill of materials.
 See %s for a terser version suitable for spreadsheet import.
 """ % fn
-    for identifier, component in sorted(components.items()):
+    for identifier, component in sorted(pcb().components.items()):
         if component.footprint == "myelin-kicad:via_single":
             continue
         item = [identifier, component.value, component.desc, component.footprint]
@@ -97,13 +111,13 @@ class Component:
             counter = 1
             while 1:
                 maybe = identifier.replace("?", str(counter))
-                if not components.has_key(maybe):
+                if not pcb().components.has_key(maybe):
                     identifier = maybe
                     break
                 counter += 1
         self.identifier = identifier
-        assert not components.has_key(self.identifier), "identifier %s is already taken" % self.identifier
-        components[self.identifier] = self
+        assert not pcb().components.has_key(self.identifier), "identifier %s is already taken" % self.identifier
+        pcb().components[self.identifier] = self
 
         self.footprint = footprint
         self.desc = desc if desc else ""
@@ -125,7 +139,7 @@ class Component:
             pin.component = self
             for net in pin.nets:
                 if not net: continue  # ignore net ""
-                nets.setdefault(net, []).append(pin)
+                pcb().nets.setdefault(net, []).append(pin)
 
     def xilinx_pins_by_net(self):
         r = {}
@@ -243,3 +257,7 @@ def update_xilinx_constraints(xilinx, fn):
         for line in lines:
             print>>f, line
         print "Xilinx constraints updated in %s" % fn
+
+def check_xc9500xl_pinout(xilinx, cpld_path, project_name):
+    print("Checking Xilinx XC9500XL series pinout against fitter output")
+    fitter_report_fn = os.path.join(cpld_path, '%s_html/fit')
