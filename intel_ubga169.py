@@ -5,6 +5,9 @@ X = Module(
 	description="UBGA169 for Intel Max 10 FPGAs"
 )
 
+# Intel recommends 0.34mm NSMD pads for 0.8mm UBGA chips:
+# https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/an/an114.pdf
+
 # plastic chip is 11 mm x 11 mm
 D = E = 11.0
 
@@ -12,8 +15,10 @@ W = 13
 H = 13
 
 # 0.8mm ball spacing, 0.5mm ball dia, 0.4mm pad dia
-BALL_SPACING = 0.8
-PAD_DIA = 0.4
+BALL_SPACING = 0.8  # ball pitch.  ball dia is 0.5
+PAD_DIA = 0.34  # diameter of copper pad
+MASK_DIA = PAD_DIA + 0.03  # diameter of opening in solder mask
+PAD_CLEARANCE = 0.127  # 5 mil pad clearance, to push it out past the NSMD ring
 
 # top left ball
 x0 = -(BALL_SPACING * (W - 1.0) / 2)
@@ -37,16 +42,9 @@ for y in range(H):
 			w=PAD_DIA,
 			h=PAD_DIA,
 			shape='circle',
+			solder_mask_margin=(MASK_DIA - PAD_DIA) / 2,
+			pad_clearance=PAD_CLEARANCE,
 		))
-
-X.save()
-
-# Make a version that's able to be routed with 6 mil trace/space
-
-X.identifier += "_smallpads"
-for elem in X.elements:
-	if isinstance(elem, Pad):
-		elem.w = elem.h = 0.342
 
 X.save()
 
