@@ -201,7 +201,7 @@ def R0805(value, net1, net2, ref="R?", handsoldering=True):
 # SOD-323 diode
 def DSOD323(value, net_cathode, net_anode, ref="D?"):
     return Component(
-        footprint="Diodes_SMD:D_SOD-323_HandSoldering",
+        footprint="Diode_SMD:D_SOD-323_HandSoldering",
         identifier=ref,
         value=value,
         desc="%s diode in SOD323 package" % value,
