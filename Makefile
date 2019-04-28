@@ -4,6 +4,7 @@ OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	bourns_cat16_j8_resistor_array.kicad_mod \
 	cherry_mx_pcb_mount.kicad_mod \
 	cypress_lae064_fbga.kicad_mod \
+	dgh255q5r5.kicad_mod \
 	din_5_econet_pcb_mount.kicad_mod \
 	minidin_6_ps2_pcb_mount.kicad_mod \
 	header_2x20_100mil.kicad_mod \
@@ -20,6 +21,7 @@ OUTPUTS=acorn_electron_cartridge_socket.kicad_mod \
 	pro_micro.kicad_mod \
 	raspberry_pi_zero_flipped.kicad_mod \
 	sdram_54tfbga.kicad_mod \
+	so8_pcf8583t_7.5x7.5mm.kicad_mod \
 	sst_plcc32_nh.kicad_mod \
 	ti_zrd_54_pbga.kicad_mod \
 	usb_a_host_pth_amphenol.kicad_mod \
