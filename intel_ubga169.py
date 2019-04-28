@@ -52,6 +52,9 @@ X.save()
 10M08SCU169 pinout:
 
 Bank Number	VREF	Pin Name/Function	Optional Function(s)	Configuration Function	Dedicated Tx/Rx Channel	Emulated LVDS Output Channel	IO Performance	U169
+"""
+
+description_lines = """
 1A	VREFB1N0	IO			DIFFIO_RX_L1n	DIFFOUT_L1n	Low_Speed	D1
 1A	VREFB1N0	IO			DIFFIO_RX_L1p	DIFFOUT_L1p	Low_Speed	C2
 1A	VREFB1N0	IO			DIFFIO_RX_L3n	DIFFOUT_L3n	Low_Speed	E3
@@ -70,6 +73,7 @@ Bank Number	VREF	Pin Name/Function	Optional Function(s)	Configuration Function	D
 1B	VREFB1N0	IO			DIFFIO_RX_L14p	DIFFOUT_L14p	Low_Speed	G4
 1B	VREFB1N0	IO			DIFFIO_RX_L16n	DIFFOUT_L16n	Low_Speed	H2
 1B	VREFB1N0	IO			DIFFIO_RX_L16p	DIFFOUT_L16p	Low_Speed	H3
+
 2	VREFB2N0	IO	CLK0n		DIFFIO_RX_L18n	DIFFOUT_L18n	High_Speed	G5
 2	VREFB2N0	IO			DIFFIO_RX_L19n	DIFFOUT_L19n	High_Speed	J1
 2	VREFB2N0	IO	CLK0p		DIFFIO_RX_L18p	DIFFOUT_L18p	High_Speed	H6
@@ -86,6 +90,7 @@ Bank Number	VREF	Pin Name/Function	Optional Function(s)	Configuration Function	D
 2	VREFB2N0	IO			DIFFIO_RX_L28n	DIFFOUT_L28n	High_Speed	K1
 2	VREFB2N0	IO	PLL_L_CLKOUTp		DIFFIO_RX_L27p	DIFFOUT_L27p	High_Speed	L3
 2	VREFB2N0	IO			DIFFIO_RX_L28p	DIFFOUT_L28p	High_Speed	K2
+
 3	VREFB3N0	IO			DIFFIO_TX_RX_B1n	DIFFOUT_B1n	High_Speed	L5
 3	VREFB3N0	IO			DIFFIO_RX_B2n	DIFFOUT_B2n	High_Speed	M4
 3	VREFB3N0	IO			DIFFIO_TX_RX_B1p	DIFFOUT_B1p	High_Speed	L4
@@ -154,6 +159,7 @@ Bank Number	VREF	Pin Name/Function	Optional Function(s)	Configuration Function	D
 6	VREFB6N0	IO			DIFFIO_RX_R31n	DIFFOUT_R31n	High_Speed	D9
 6	VREFB6N0	IO			DIFFIO_RX_R33p	DIFFOUT_R33p	High_Speed	D12
 6	VREFB6N0	IO			DIFFIO_RX_R33n	DIFFOUT_R33n	High_Speed	D11
+
 8	VREFB8N0	IO			DIFFIO_RX_T14p	DIFFOUT_T14p	Low_Speed	C10
 8	VREFB8N0	IO			DIFFIO_RX_T15p	DIFFOUT_T15p	Low_Speed	A8
 8	VREFB8N0	IO			DIFFIO_RX_T14n	DIFFOUT_T14n	Low_Speed	C9
@@ -221,4 +227,44 @@ Bank Number	VREF	Pin Name/Function	Optional Function(s)	Configuration Function	D
 		VCC_ONE						G8
 		VCC_ONE						G6
 		VCC_ONE						F7
-"""
+""".split("\n")
+
+iocount = 0
+confcount = 0
+for line in description_lines:
+	if not line.strip(): continue
+	bits = line.split("\t")
+	bank, vref, elec, special, config, diffio, diffout, speed, pin = bits
+	#print bank, vref, elec, special, q, diffio, diffout, speed, pin
+	print pin,
+	if config:
+		print "config: %s" % config
+		confcount += 1
+		pin_io_id = "fpga_%s" % config
+	elif elec != "IO":
+		print "not IO: %s" % elec
+		if elec.startswith("VCC"):
+			pin_io_id = "3V3" 
+		elif elec == "GND":
+			pin_io_id = "GND"
+		else:
+			raise Exception("bad elec for %s: %s" % (pin, elec))
+	else:
+		if diffio:
+			diffio_id = diffio.split("_")[-1]
+			if special:
+				pin_io_id = "special_b%s_%s_%s_%s" % (bank, special, diffio_id, pin)
+			else:
+				pin_io_id = "io_b%s_%s_%s" % (bank, diffio_id, pin)
+		elif special:
+			pin_io_id = "special_%s_nodiff_%s" % (vref, pin)
+		else:
+			pin_io_id = "TODO_unknown_b%s_%s" % (bank, pin)
+
+		print "normal: bank=%s elec=%s special=%s diffio=%s diffout=%s speed=%s pin=%s io_id=%s" % (
+			bank, elec, special, diffio, diffout, speed, pin, pin_io_id)
+		iocount += 1
+
+	print('Pin("%s", "", "%s"),' % (pin, pin_io_id))
+print "%d ios + %d config" % (iocount, confcount)
+
