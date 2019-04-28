@@ -23,7 +23,8 @@ for ident, desc, pins in [
 
     # pad and hole diameters
     HOLE_DIA = 0.9
-    PAD_DIA = HOLE_DIA + 0.7
+    RING_DIA = 0.7  # 2 x thickness of plated ring
+    PAD_DIA = HOLE_DIA + RING_DIA
     MOUNT_DIA = 1.0
 
     # bounding box
@@ -48,7 +49,12 @@ for ident, desc, pins in [
     X.add(Pin("M2",  2.5, MOUNT_ROW_1, MOUNT_DIA, MOUNT_DIA))
 
     # shield pin - shown as a slot in the datasheet, but just a hole here
-    X.add(Pin("S", 0, BOX_TOP+4.7, 2.2+PAD_DIA-HOLE_DIA, 2.2))
+    X.add(Pin("S1", 0, BOX_TOP+4.7, 2.2+RING_DIA, 2.2))
+
+    # optional shield pins that are on the sockets I have from eBay, and also
+    # the CUI MD-xxSM series, but not the MD-xxS
+    X.add(Pin("S2", -BOX_WIDTH/2, BOX_TOP+5.5, 2.0+RING_DIA, 2.0))
+    X.add(Pin("S3",  BOX_WIDTH/2, BOX_TOP+5.5, 2.0+RING_DIA, 2.0))
 
     if pins == 6:
         X.add(Pin("M3", -5.0, SIGNAL_ROW_2, MOUNT_DIA, MOUNT_DIA))
