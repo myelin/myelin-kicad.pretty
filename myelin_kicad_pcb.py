@@ -136,10 +136,12 @@ class Component:
             if seen_pins.has_key(pin.number):
                 raise Exception("Pin %s seen twice" % pin.number)
             seen_pins[pin.number] = pin
+            print("- Add pin %s to component %s nets %s" % (pin.number, self.identifier, repr(pin.nets)))
             pin.component = self
             for net in pin.nets:
                 if not net: continue  # ignore net ""
                 pcb().nets.setdefault(net, []).append(pin)
+                #print("  - Add net %s to %s.%s" % (net, self.identifier, pin.number))
 
     def xilinx_pins_by_net(self):
         r = {}
