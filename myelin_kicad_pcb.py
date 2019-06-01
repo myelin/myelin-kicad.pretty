@@ -92,7 +92,10 @@ def dump_bom(fn, readable_fn):
     print>>rf, """This is the human-readable bill of materials.
 See %s for a terser version suitable for spreadsheet import.
 """ % fn
-    for identifier, component in sorted(pcb().components.items()):
+    for identifier, component in sorted(
+        pcb().components.items(),
+        key=lambda i: (i[1].desc, i[1].value, i[0])
+    ):
         if component.footprint == "myelin-kicad:via_single":
             continue
         item = [identifier, component.value, component.desc, component.footprint]
@@ -167,7 +170,7 @@ def C0805(value, net1, net2, ref="C?", handsoldering=True):
         footprint="Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" if handsoldering else "Capacitor_SMD:C_0805_2012Metric",
         identifier=ref,
         value=value,
-        desc="%s capacitor in 0805 package" % value,
+        desc="Capacitor 0805: %s" % value,
         pins=[
             Pin(1, "1", [net1]),
             Pin(2, "2", [net2]),
@@ -180,7 +183,7 @@ def C0402(value, net1, net2, ref="C?"):
         footprint="Capacitor_SMD:C_0402_1005Metric",
         identifier=ref,
         value=value,
-        desc="%s capacitor in 0402 package" % value,
+        desc="Capacitor 0402: %s" % value,
         pins=[
             Pin(1, "1", [net1]),
             Pin(2, "2", [net2]),
@@ -193,7 +196,7 @@ def R0805(value, net1, net2, ref="R?", handsoldering=True):
         footprint="Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" if handsoldering else "Resistor_SMD:R_0805_2012Metric",
         identifier=ref,
         value=value,
-        desc="%s resistor in 0805 package" % value,
+        desc="Resistor 0805: %s" % value,
         pins=[
             Pin(1, "1", [net1]),
             Pin(2, "2", [net2]),
@@ -206,7 +209,7 @@ def DSOD323(value, net_cathode, net_anode, ref="D?"):
         footprint="Diode_SMD:D_SOD-323_HandSoldering",
         identifier=ref,
         value=value,
-        desc="%s diode in SOD323 package" % value,
+        desc="Diode SOD323: %s" % value,
         pins=[
             Pin(1, "1", net_cathode),
             Pin(2, "2", net_anode),
