@@ -4,7 +4,8 @@
 cpld = Component(
     footprint="myelin-kicad:xilinx_vqg44",
     identifier="U?",
-    value="XC9572XL",
+    value="XC9572XL-10VQG44C",
+    desc="IC CPLD Xilinx 72MC 44-pin; https://www.digikey.com/products/en?keywords=122-1448-ND",
     pins=[
         Pin(39, "P1.2", [""]),
         Pin(40, "P1.5", [""]),

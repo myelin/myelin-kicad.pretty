@@ -96,6 +96,7 @@ See %s for a terser version suitable for spreadsheet import.
         pcb().components.items(),
         key=lambda i: (i[1].desc, i[1].value, i[0])
     ):
+        if component.exclude_from_bom: continue
         if component.footprint == "myelin-kicad:via_single":
             continue
         item = [identifier, component.value, component.desc, component.footprint]
@@ -107,7 +108,7 @@ See %s for a terser version suitable for spreadsheet import.
     print "Saved BOM to %s" % fn
 
 class Component:
-    def __init__(self, identifier, footprint, value, pins=None, buses=None, desc=None):
+    def __init__(self, identifier, footprint, value, pins=None, buses=None, desc=None, exclude_from_bom=False):
         if pins is None: pins = []
         # autonumber identifiers
         if identifier.find("?") != -1:
@@ -124,6 +125,7 @@ class Component:
 
         self.footprint = footprint
         self.desc = desc if desc else ""
+        self.exclude_from_bom = exclude_from_bom
         self.value = value
         self.buses = buses
 
