@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 # This file generates KiCad netlist (.net) files directly from a
 # Python script, that specifies all parts, connections, and
 # footprints.
@@ -31,9 +33,34 @@ def fmt_item(item):
 
 # format python list into kicad netlist format
 def dump_list(list):
-    return "(%s)\n" % " ".join(
+    # Rules for nice display:
+    # If a list contains only strings, render it in one line
+    # If a list can be rendered in one line, render it in one line
+    # Otherwise render it as a block
+
+    rendered_items = [
         dump_list(item) if type(item) == type([]) else fmt_item(item)
-        for item in list)
+        for item in list]
+
+    # Just a single value?
+    if len(rendered_items) < 2:
+        return "(%s)" % rendered_items[0]
+
+    # Will it fit in a line?
+    total_length = 2 + len(rendered_items) + sum(len(item) for item in rendered_items)
+    single_line = "(%s)" % " ".join(rendered_items)
+    if len(single_line) < 120 and "\n" not in single_line:
+        return single_line
+
+    # Special case for the root, so we pass the regex used to detect file format
+    if rendered_items[0] == "export":
+        return "(%s %s)" % (
+            rendered_items[0],
+            "\n  ".join(item.replace("\n", "\n  ") for item in rendered_items[1:]),
+        )
+
+    # Render as a block
+    return "(%s)" % "\n  ".join(item.replace("\n", "\n  ") for item in rendered_items)
 
 # write netlist to disk
 def dump_netlist(fn):
@@ -57,41 +84,43 @@ def dump_netlist(fn):
     for net_id, pins in sorted(pcb().nets.items()):
         net_case_check.setdefault(net_id.lower(), set()).add(net_id)
         net_counter += 1
-        print "=== %s ===" % net_id
+        print("=== %s ===" % net_id)
         export_nodes = []
         for pin in pins:
-            print "  - %s.%s (%s %s)" % (pin.component.identifier, pin.number, pin.component.value, pin.name)
+            print("  - %s.%s (%s %s)" % (pin.component.identifier, pin.number, pin.component.value, pin.name))
             export_nodes.append(["node", ["ref", pin.component.identifier], ["pin", pin.number]])
         export_nets.append(["net", ["code", net_counter], ["name", net_id if net_id else "_default"]] + export_nodes)
         if len(export_nodes) == 1:
             nets_with_one_node.add(net_id)
 
     for net_id in nets_with_one_node:
-        print "WARNING: net %s only has one attached node" % net_id
+        print("WARNING: net %s only has one attached node" % net_id)
 
     bad_nets_exist = 0
     for net_ids in net_case_check.values():
         if len(net_ids) == 1:
             continue
-        print "Inconsistent casing in nets: %s" % " ".join(net_ids)
+        print("Inconsistent casing in nets: %s" % " ".join(net_ids))
         bad_nets_exist = 1
     if bad_nets_exist:
         raise Exception("Inconsistent net casing; see details above")
 
-    print>>open(fn, "w"), dump_list([
+    print(dump_list([
         "export",
         ["version", "D"],
-        ["components", export_components],
-        ["nets", export_nets],
-    ])
-    print "Saved netlist to %s" % fn
+        ["components"] + export_components,
+        ["nets"] + export_nets,
+    ]), file=open(fn, "w"))
+    print("Saved netlist to %s" % fn)
 
-def dump_bom(fn, readable_fn):
+def dump_bom(fn, readable_fn, seeed_fn=None):
+    # Write readable BOM and collate items
     list = [["Identifier", "Value", "Description", "KiCad package"]]
+    merged = {}  # map of (part number, link) -> [identifier, identifier, ...]
     rf = open(readable_fn, "w")
-    print>>rf, """This is the human-readable bill of materials.
+    print("""This is the human-readable bill of materials.
 See %s for a terser version suitable for spreadsheet import.
-""" % fn
+""" % fn, file=rf)
     for identifier, component in sorted(
         pcb().components.items(),
         key=lambda i: (i[1].desc, i[1].value, i[0])
@@ -101,30 +130,53 @@ See %s for a terser version suitable for spreadsheet import.
             continue
         item = [identifier, component.value, component.desc, component.footprint]
         list.append(item)
-        print>>rf, "%s\n- Value: %s\n- Description: %s\n- KiCad package: %s\n" % tuple(item)
+
+        if not component.partno or not component.link:
+            print("WARNING: component %s is missing partno or link" % component.identifier)
+        else:
+            mergekey = (component.partno, component.link)
+            merged.setdefault(mergekey, []).append(component.identifier)
+        print("%s\n- Value: %s\n- Description: %s\n- KiCad package: %s\n" % tuple(item), file=rf)
+
+    # Write simple spreadsheet BOM
     f = open(fn, "w")
     for line in list:
-        print>>f, "\t".join(line)
-    print "Saved BOM to %s" % fn
+        print("\t".join(line), file=f)
+    print("Saved BOM to %s" % fn)
+
+    # Write Seeed-format BOM; see https://www.seeedstudio.com/fusion_pcb.html
+    if seeed_fn:
+        assert seeed_fn.endswith(".csv"), "Seeed Fusion BOM files must be in CSV/XLS/XLSX format"
+        list = [["Designator", "Manufacturer Part Number or Seeed SKU", "Qty", "Link"]]
+        for (partno, link), identifiers in merged.items():
+            print(partno, link, identifiers)
+        print("Saved Seeed-format BOM to %s" % seeed_fn)
 
 class Component:
-    def __init__(self, identifier, footprint, value, pins=None, buses=None, desc=None, exclude_from_bom=False):
+    def __init__(self, identifier, footprint, value, pins=None, buses=None, desc=None, exclude_from_bom=False, partno=None, link=None):
         if pins is None: pins = []
         # autonumber identifiers
         if identifier.find("?") != -1:
             counter = 1
             while 1:
                 maybe = identifier.replace("?", str(counter))
-                if not pcb().components.has_key(maybe):
+                if maybe not in pcb().components:
                     identifier = maybe
                     break
                 counter += 1
         self.identifier = identifier
-        assert not pcb().components.has_key(self.identifier), "identifier %s is already taken" % self.identifier
+        assert self.identifier not in pcb().components, "identifier %s is already taken" % self.identifier
         pcb().components[self.identifier] = self
 
         self.footprint = footprint
-        self.desc = desc if desc else ""
+        self.partno = partno
+        self.link = link
+        if desc:
+            self.desc = desc
+        elif self.partno and self.link:
+            self.desc = "%s; %s" % (self.partno, self.link)
+        else:
+            self.desc = ""
         self.exclude_from_bom = exclude_from_bom
         self.value = value
         self.buses = buses
@@ -138,7 +190,7 @@ class Component:
         self.pins = pins
         seen_pins = {}
         for pin in self.pins:
-            if seen_pins.has_key(pin.number):
+            if pin.number in seen_pins:
                 raise Exception("Pin %s seen twice" % pin.number)
             seen_pins[pin.number] = pin
             print("- Add pin %s to component %s nets %s" % (pin.number, self.identifier, repr(pin.nets)))
@@ -163,7 +215,7 @@ class Pin:
     def __init__(self, number, name, nets=None):
         if nets is None: nets = []
         if type(nets) == type(""): nets = [nets]
-        assert type(nets) == type([]), "invalid argument to nets: %s" % `nets`
+        assert type(nets) == type([]), "invalid argument to nets: %s" % repr(nets)
         self.number, self.name, self.nets = number, name, nets
 
 # 0805 capacitor
@@ -224,7 +276,7 @@ def pin_to_loc(pin_id):
     return pin_id
 
 def update_xilinx_constraints(xilinx, fn):
-    print "Updating constraints file %s" % fn
+    print("Updating constraints file %s" % fn)
     changed = False
     lines = []
     seen = set()
@@ -236,15 +288,15 @@ def update_xilinx_constraints(xilinx, fn):
             net = m.group(1)
             pin = m.group(2)
             seen.add(net)
-            if not nets.has_key(net):
-                print "WARNING: unknown net specified in Xilinx constraints line: %s" % line
+            if net not in nets:
+                print("WARNING: unknown net specified in Xilinx constraints line: %s" % line)
             elif len(nets[net]) > 1:
-                print "WARNING: more than one pin assigned to Xilinx net %s" % net
+                print("WARNING: more than one pin assigned to Xilinx net %s" % net)
             elif nets[net][0] == pin:
-                print "OK: pin %s is still assigned to Xilinx net %s" % (pin, net)
+                print("OK: pin %s is still assigned to Xilinx net %s" % (pin, net))
             else:
                 pin_id = nets[net][0]
-                print "CHANGED: Xilinx net %s is now on pin %s" % (net, pin_id)
+                print("CHANGED: Xilinx net %s is now on pin %s" % (net, pin_id))
                 line = "NET %s LOC = %s;" % (net, pin_to_loc(pin_id))
                 changed = True
         lines.append(line)
@@ -254,16 +306,16 @@ def update_xilinx_constraints(xilinx, fn):
         if net in ('3V3', 'GND', 'cpld_TCK', 'cpld_TDO', 'cpld_TDI', 'cpld_TMS'):
             continue
         if len(pins) > 1:
-            print "WARNING: can't add net %s to Xilinx constraints file because it's connected to more than one pin: %s" % (net, `pins`)
+            print("WARNING: can't add net %s to Xilinx constraints file because it's connected to more than one pin: %s" % (net, repr(pins)))
         else:
-            print "CHANGED: Add Xilinx net %s (pin %s) to constraints file" % (net, pins[0])
+            print("CHANGED: Add Xilinx net %s (pin %s) to constraints file" % (net, pins[0]))
             lines.append("NET %s LOC = %s;" % (net, pin_to_loc(pins[0])))
             changed = True
     if changed:
         f = open(fn, 'w')
         for line in lines:
-            print>>f, line
-        print "Xilinx constraints updated in %s" % fn
+            print(line, file=f)
+        print("Xilinx constraints updated in %s" % fn)
 
 def check_xc9500xl_pinout(xilinx, cpld_path, project_name):
     print("Checking Xilinx XC9500XL series pinout against fitter output")
