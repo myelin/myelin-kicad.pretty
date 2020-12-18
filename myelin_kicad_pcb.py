@@ -219,9 +219,11 @@ class Pin:
         self.number, self.name, self.nets = number, name, nets
 
 # 0805 capacitor
-def C0805(value, net1, net2, ref="C?", handsoldering=True):
+def C0805(value, net1, net2, ref="C?", handsoldering=True, footprint=None):
+    if not footprint:
+        footprint = "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" if handsoldering else "Capacitor_SMD:C_0805_2012Metric"
     return Component(
-        footprint="Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" if handsoldering else "Capacitor_SMD:C_0805_2012Metric",
+        footprint=footprint,
         identifier=ref,
         value=value,
         desc="Capacitor 0805: %s" % value,
