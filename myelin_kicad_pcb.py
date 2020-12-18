@@ -260,17 +260,27 @@ def R0805(value, net1, net2, ref="R?", handsoldering=True):
     )
 
 # SOD-323 diode
-def DSOD323(value, net_cathode, net_anode, ref="D?"):
+def D(value, net_cathode, net_anode, footprint, package, ref="D?"):
     return Component(
-        footprint="Diode_SMD:D_SOD-323_HandSoldering",
+        footprint=footprint,
         identifier=ref,
         value=value,
-        desc="Diode SOD323: %s" % value,
+        desc="Diode %s: %s" % (package, value),
         pins=[
             Pin(1, "1", net_cathode),
             Pin(2, "2", net_anode),
         ],
     )
+
+def DSOD123(value, *args, **kwargs):
+    return D(value, *args, footprint="Diode_SMD:D_SOD-123", package="SOD123", **kwargs)
+
+def DSOD323(value, *args, **kwargs):
+    assert 'bat54' not in value.lower(), "BAT54 is SOD123, not SOD323"  # I've made this mistake...
+    return D(value, *args, footprint="Diode_SMD:D_SOD-323_HandSoldering", package="SOD323", **kwargs)
+
+def LED0805(value, *args, **kwargs):
+    return D(value, *args, footprint="LED_SMD:LED_0805_2012Metric", package="0805", **kwargs)
 
 def pin_to_loc(pin_id):
     if type(pin_id) == types.IntType:
