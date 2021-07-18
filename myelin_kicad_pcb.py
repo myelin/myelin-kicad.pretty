@@ -4,6 +4,7 @@ from __future__ import print_function
 # Python script, that specifies all parts, connections, and
 # footprints.
 
+import csv
 import os
 import re
 import types
@@ -113,10 +114,11 @@ def dump_netlist(fn):
     ]), file=open(fn, "w"))
     print("Saved netlist to %s" % fn)
 
-def dump_bom(fn, readable_fn, seeed_fn=None):
+def dump_bom(fn, readable_fn, seeed_fn=None, jlc_fn=None):
     # Write readable BOM and collate items
-    list = [["Identifier", "Value", "Description", "KiCad package"]]
+    list = [["Identifier", "Value", "Description", "KiCad package", "LCSC part"]]
     merged = {}  # map of (part number, link) -> [identifier, identifier, ...]
+    jlc_merged = {}  # map of (LCSC ID, comment, footprint) -> [identifier, ...]
     rf = open(readable_fn, "w")
     print("""This is the human-readable bill of materials.
 See %s for a terser version suitable for spreadsheet import.
@@ -128,7 +130,7 @@ See %s for a terser version suitable for spreadsheet import.
         if component.exclude_from_bom: continue
         if component.footprint == "myelin-kicad:via_single":
             continue
-        item = [identifier, component.value, component.desc, component.footprint]
+        item = [identifier, component.value, component.desc, component.footprint, component.jlc_part or ""]
         list.append(item)
 
         if not component.partno or not component.link:
@@ -136,7 +138,11 @@ See %s for a terser version suitable for spreadsheet import.
         else:
             mergekey = (component.partno, component.link)
             merged.setdefault(mergekey, []).append(component.identifier)
-        print("%s\n- Value: %s\n- Description: %s\n- KiCad package: %s\n" % tuple(item), file=rf)
+
+        if component.jlc_part:
+            mergekey = (component.jlc_part, component.desc, component.footprint)
+            jlc_merged.setdefault(mergekey, []).append(component.identifier)
+        print("%s\n- Value: %s\n- Description: %s\n- KiCad package: %s\n" % tuple(item)[:4], file=rf)
 
     # Write simple spreadsheet BOM
     f = open(fn, "w")
@@ -147,13 +153,24 @@ See %s for a terser version suitable for spreadsheet import.
     # Write Seeed-format BOM; see https://www.seeedstudio.com/fusion_pcb.html
     if seeed_fn:
         assert seeed_fn.endswith(".csv"), "Seeed Fusion BOM files must be in CSV/XLS/XLSX format"
-        list = [["Designator", "Manufacturer Part Number or Seeed SKU", "Qty", "Link"]]
+        list = [["Comment", "Designator", "Footprint", "LCSC"]]
         for (partno, link), identifiers in merged.items():
             print(partno, link, identifiers)
         print("Saved Seeed-format BOM to %s" % seeed_fn)
 
+    # Write JLC-format BOM; see https://support.jlcpcb.com/article/84-how-to-generate-the-bom-and-centroid-file-from-kicad
+    if jlc_fn:
+        assert jlc_fn.endswith(".csv"), "JLC PCBA BOM files must be in CSV format"
+        list = [["Designator", "Val", "Package"]]
+        with open(jlc_fn, "wt", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["Comment", "Designator", "Footprint", "LCSC"])
+            for (jlc_part, desc, footprint), identifiers in jlc_merged.items():
+                w.writerow([desc, ",".join(identifiers), footprint, jlc_part])
+        print("Saved JLC-format BOM to %s" % jlc_fn)
+
 class Component:
-    def __init__(self, identifier, footprint, value, pins=None, buses=None, desc=None, exclude_from_bom=False, partno=None, link=None):
+    def __init__(self, identifier, footprint, value, pins=None, buses=None, desc=None, exclude_from_bom=False, partno=None, link=None, jlc_part=None):
         if pins is None: pins = []
         # autonumber identifiers
         if identifier.find("?") != -1:
@@ -171,6 +188,7 @@ class Component:
         self.footprint = footprint
         self.partno = partno
         self.link = link
+        self.jlc_part = jlc_part
         if desc:
             self.desc = desc
         elif self.partno and self.link:
@@ -219,13 +237,19 @@ class Pin:
         self.number, self.name, self.nets = number, name, nets
 
 # 0805 capacitor
-def C0805(value, net1, net2, ref="C?", handsoldering=True, footprint=None):
+def C0805(value, net1, net2, ref="C?", handsoldering=True, footprint=None, jlc_part=None):
     if not footprint:
         footprint = "Capacitor_SMD:C_0805_2012Metric_Pad1.15x1.40mm_HandSolder" if handsoldering else "Capacitor_SMD:C_0805_2012Metric"
+    if not jlc_part:
+        jlc_part = {
+            "100n": "C49678",
+            "1u": "C28323",
+        }.get(value, None)
     return Component(
         footprint=footprint,
         identifier=ref,
         value=value,
+        jlc_part=jlc_part,
         desc="Capacitor 0805: %s" % value,
         pins=[
             Pin(1, "1", [net1]),
@@ -247,11 +271,23 @@ def C0402(value, net1, net2, ref="C?"):
     )
 
 # 0805 resistor
-def R0805(value, net1, net2, ref="R?", handsoldering=True):
+def R0805(value, net1, net2, ref="R?", handsoldering=True, jlc_part=None):
+    if not jlc_part:
+        jlc_part = {
+            "0R": "C17477",
+            "68R": "C17802",
+            "330R": "C17630",
+            "1k": "C17513",
+            "2k2": "C17520",
+            "4k7": "C17673",
+            "10k": "C17414",
+            "100k": "C17407",
+        }.get(value, None)
     return Component(
         footprint="Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" if handsoldering else "Resistor_SMD:R_0805_2012Metric",
         identifier=ref,
         value=value,
+        jlc_part=jlc_part,
         desc="Resistor 0805: %s" % value,
         pins=[
             Pin(1, "1", [net1]),
@@ -260,11 +296,12 @@ def R0805(value, net1, net2, ref="R?", handsoldering=True):
     )
 
 # SOD-323 diode
-def D(value, net_cathode, net_anode, footprint, package, ref="D?"):
+def D(value, net_cathode, net_anode, footprint, package, ref="D?", jlc_part=None):
     return Component(
         footprint=footprint,
         identifier=ref,
         value=value,
+        jlc_part=jlc_part,
         desc="Diode %s: %s" % (package, value),
         pins=[
             Pin(1, "1", net_cathode),
