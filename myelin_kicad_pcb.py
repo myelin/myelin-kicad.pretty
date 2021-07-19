@@ -63,6 +63,15 @@ def dump_list(list):
     # Render as a block
     return "(%s)" % "\n  ".join(item.replace("\n", "\n  ") for item in rendered_items)
 
+# Split numeric suffix from component ID so we can order C9 < C10 (for example)
+def split_component_identifier(identifier):
+    ident, counter = re.search(r"^(.*?)(\d*)$", identifier).groups()
+    return (ident, int(counter) if counter else 0)
+
+# Smoke test
+assert split_component_identifier("C123") == ("C", 123)
+assert split_component_identifier("Test") == ("Test", 0)
+
 # write netlist to disk
 def dump_netlist(fn):
     export_components = []
@@ -125,7 +134,7 @@ See %s for a terser version suitable for spreadsheet import.
 """ % fn, file=rf)
     for identifier, component in sorted(
         pcb().components.items(),
-        key=lambda i: (i[1].desc, i[1].value, i[0])
+        key=lambda i: (i[1].desc, i[1].value, split_component_identifier(i[0]))
     ):
         if component.exclude_from_bom: continue
         if component.footprint == "myelin-kicad:via_single":
